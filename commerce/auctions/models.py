@@ -10,6 +10,7 @@ class Listing(models.Model):
     item_name = models.CharField(max_length=64)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     created_date = models.DateTimeField(default=now)
+    description = models.TextField(max_length=300, default="Description missing")
     initial_bid = models.DecimalField(max_digits=10,decimal_places=2)
 
     def __str__(self):
