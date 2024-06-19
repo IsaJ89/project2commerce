@@ -7,16 +7,21 @@ class User(AbstractUser):
     pass
 
 class Listing(models.Model):
+    category_choices = [('fashion','Fashion'),
+                        ('electronics','Electronics'),
+                        ('health','Health'),
+                        ('toys','Toys'),
+                        ('home','Home'),
+                        ('jewelry','Jewelry')
+                        ]
     item_name = models.CharField(max_length=64)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     created_date = models.DateTimeField(default=now)
-    description = models.TextField(max_length=300, default="Description missing")
+    description = models.TextField(max_length=300, default="Add description")
     initial_bid = models.DecimalField(max_digits=10,decimal_places=2)
-    photo = models.TextField(max_length=150, default="Image link missing")
-    category = models.CharField(max_length=50, default="Category missing")
+    photo = models.URLField(max_length=50, blank=True)
+    category = models.CharField(max_length=50, default="Add category", choices=category_choices, blank=True)
 
-    def __str__(self):
-        return f"{self.item_name} {self.created_by.username} {self.created_date} {self.initial_bid}"
 
 
 class Bid(models.Model):

@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.utils.timezone import now
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -64,7 +65,13 @@ def register(request):
 
 def create_listing(request):
     if request.method == "POST":
-        pass
+        form = ListingForm(request.POST)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.created_by = request.user
+            listing.created_date = now()
+            listing.save()
+            return HttpResponseRedirect(reverse("index"))
     else:
         form = ListingForm()
     return render(request, "auctions/listing.html", {
