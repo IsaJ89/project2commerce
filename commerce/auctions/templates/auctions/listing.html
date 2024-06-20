@@ -4,7 +4,7 @@ Create Listing
 {% endblock%}
 
 {% block body %}
-<form action="{% url 'listing' %}" method="post">
+<form action="{% url 'listing' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Create">
