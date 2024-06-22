@@ -13,7 +13,8 @@ class Listing(models.Model):
                         ('toys','Toys'),
                         ('home','Home'),
                         ('jewelry','Jewelry'),
-                        ('automobiles','Automobiles')
+                        ('automobiles','Automobiles'),
+                        ('luxury', 'Luxury')
                         ]
     item_name = models.CharField(max_length=64)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
@@ -23,10 +24,18 @@ class Listing(models.Model):
     image = models.ImageField(upload_to='images', blank=True, null=True)
     category = models.CharField(max_length=50, default="Add category", choices=category_choices, blank=True)
 
+    def __str__(self):
+        return f"{self.item_name}"
 
 
 class Bid(models.Model):
-    pass
+    item = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bids',null=True)
+    placed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids",null=True)
+    bid_value = models.DecimalField(max_digits=10,decimal_places=2, null=True)
+    placed_on = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return f"Item: {self.item} Bid Value:{self.bid_value}"
 
 class Comment(models.Model):
     pass

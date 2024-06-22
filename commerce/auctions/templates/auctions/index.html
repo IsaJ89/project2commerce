@@ -5,7 +5,8 @@
     {% if listings %}
         {% for listing in listings %}
             <div>
-                <div>{{ listing.item_name }} {{ listing.description }}</div>
+                <div><a href="{% url 'view_listing' listing.id%}">{{ listing.item_name }}</a></div>
+                <div>{{ listing.description }}</div>
                 {% if listing.image %}
                     <div><img src="{{ listing.image.url }}" alt="listing.item_name" height="250" width="250"></div>
                 {% endif %}

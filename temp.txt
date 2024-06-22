@@ -4,3 +4,6 @@ Email address: isa@emailforcommerce.com
 Password: commerce123
 
 
+from auctions.models import *
+user = User.objects.get(username='')
+listing = Listing.objects.get(item_name='')
