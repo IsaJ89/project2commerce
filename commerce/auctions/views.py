@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from .forms import ListingForm
+from .forms import ListingForm, BidForm
 from .models import User, Listing
 
 
