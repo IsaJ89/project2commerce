@@ -10,4 +10,13 @@
     <div>{{ listing.created_date}}</div>
     <div>{{ listing.category }}</div>
 </div> 
+{% if user.is_authenticated %}
+<div>
+    <form action="{% url 'view_listing' listing.id %}" method="post">
+        {% csrf_token %}
+        {{ bid_form }}
+        <input type="submit" value="Place bid">
+    </form>
+</div>
+{% endif %}
 {% endblock %}

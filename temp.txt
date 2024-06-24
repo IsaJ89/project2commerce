@@ -7,3 +7,9 @@ Password: commerce123
 from auctions.models import *
 user = User.objects.get(username='')
 listing = Listing.objects.get(item_name='')
+
+
+ if bid_value < listing.starting_bid:
+        return render(request, "auctions/view_listing.html",{
+        "message": "Sorry! Your bid must be higher than the starting bid"
+   })
