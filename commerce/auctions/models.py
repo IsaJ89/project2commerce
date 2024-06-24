@@ -21,6 +21,7 @@ class Listing(models.Model):
     created_date = models.DateTimeField(default=now)
     description = models.TextField(max_length=300, default="Add description")
     starting_bid = models.DecimalField(max_digits=10,decimal_places=2)
+    current_price = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
     image = models.ImageField(upload_to='images', blank=True, null=True)
     category = models.CharField(max_length=50, default="Add category", choices=category_choices, blank=True)
 

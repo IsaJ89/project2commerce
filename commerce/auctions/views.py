@@ -9,9 +9,18 @@ from .models import User, Listing, Bid
 
 
 def index(request):
+    listings = Listing.objects.all()
+    for listing in listings:
+        bids = listing.bids.all()
+        if bids.exists():
+            highest_bid = max(bid.bid_value for bid in bids)
+            listing.current_price = highest_bid
+        else:
+            listing.current_price = listing.starting_bid
+        
     return render(request, "auctions/index.html",{
-        "listings": Listing.objects.all()
-    })
+        "listings": listings
+        })
 
 
 def login_view(request):
@@ -83,28 +92,52 @@ def create_listing(request):
 def view_listing(request, listing_id):
     bid_form = BidForm()
     listing = Listing.objects.get(pk=listing_id)
-    bids = listing.bids.all() # get bids associated with the listing
+    bids = listing.bids.all() # get bids associated with the listing; bids is a QuerySet object
+    if bids.exists():
+            highest_bid = max(bid.bid_value for bid in bids)
+            listing.current_price = highest_bid
+    else:
+        listing.current_price = listing.starting_bid
+
     if request.method == "POST":
         bid_form = BidForm(request.POST)
         if bid_form.is_valid():
             bid_value = bid_form.cleaned_data['bid_value']
         
-            if bids.bid_value:
-                for bid in bids.bid_value:
-                    if bid_value < bid:
+            if bids.exists():# check if the listing has bids associate with it
+                highest_bid = max(bid.bid_value for bid in bids)
+                if bid_value < highest_bid:
                         return render(request, "auctions/view_listing.html",{
-                            "message": "Sorry, bid must be higher than the current price of the item"
+                            "listing": listing,
+                            "message": "Sorry, bid must be higher than the current price of the item",
+                            "bid_form": bid_form
                         })
+                else:
+                    new_bid_object = bid_form.save(commit=False)
+                    new_bid_object.item = listing
+                    new_bid_object.placed_by = request.user
+                    new_bid_object.placed_on = now()
+                    new_bid_object.save()
+                    listing.current_price = new_bid_object.bid_value
+                    return HttpResponseRedirect(reverse("view_listing", args=(listing.id,)))
+                        
             else:
-                # check if bid_value is lesser than starting_bid
+                # if no pre-exising bids, check if bid_value is lesser than starting_bid
                 if bid_value < listing.starting_bid:
                     return render(request, "auctions/view_listing.html",{
-                        "message": "Sorry! Your bid must be higher than the starting bid"
+                        "listing" : listing,
+                        "message": "Sorry! Your bid must be higher than the starting bid",
+                        "bid_form": bid_form
                     })
-            
-
-        
-
+                else:
+                    new_bid_object = bid_form.save(commit=False)
+                    new_bid_object.item = listing
+                    new_bid_object.placed_by = request.user
+                    new_bid_object.placed_on = now()
+                    new_bid_object.save()
+                    listing.current_price = new_bid_object.bid_value
+                    return HttpResponseRedirect(reverse("view_listing", args=(listing.id,)))
+    
     return render(request, "auctions/view_listing.html", {
         "listing": listing,
         "bid_form": bid_form
