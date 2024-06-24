@@ -8,6 +8,7 @@ from .forms import ListingForm, BidForm
 from .models import User, Listing, Bid
 
 
+
 def index(request):
     listings = Listing.objects.all()
     for listing in listings:
