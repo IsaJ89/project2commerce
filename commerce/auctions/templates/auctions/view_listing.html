@@ -34,6 +34,10 @@ View Listing
         {% csrf_token %}
         <input type="submit" value="Add To Watchlist">
     </form>
+    <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Remove From Watchlist">
+    </form>
 </div>
 {% endif %}
 {% endblock %}

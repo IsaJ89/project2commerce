@@ -33,7 +33,7 @@ class Listing(models.Model):
 class Bid(models.Model):
     item = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bids',null=True)
     placed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids",null=True)
-    bid_value = models.DecimalField(max_digits=10,decimal_places=2, null=True)
+    bid_value = models.DecimalField(max_digits=10,decimal_places=2, blank=True, null=True)
     placed_on = models.DateTimeField(default=now)
 
     def __str__(self):

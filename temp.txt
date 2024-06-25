@@ -3,7 +3,8 @@ Username: Isa
 Email address: isa@emailforcommerce.com
 Password: commerce123
 
-
+python manage.py makemigrations
+python manage.py migrate
 python manage.py shell
 from auctions.models import *
 

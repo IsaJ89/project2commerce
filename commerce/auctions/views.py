@@ -146,6 +146,7 @@ def view_listing(request, listing_id):
         "bid_form": bid_form
     })
 
+
 def watchlist(request):
     listing_ids = []
     watchlist = Watchlist.objects.filter(user=request.user)
@@ -155,17 +156,48 @@ def watchlist(request):
         listing = Listing.objects.get(item_name=item.item)
         listing_ids.append(listing.id)
     
-    # using the zip function to combine the two iterables
-    watchlist_and_ids = zip(watchlist, listing_ids)
+    # using the zip function to combine the two iterables and turning it into a list of tuples
+    watchlist_and_ids = list(zip(watchlist, listing_ids))
     return render(request, "auctions/watchlist.html", {
         "watchlist_and_ids": watchlist_and_ids
     })
 
 def add_to_watchlist(request, listing_id):
     if request.method == "POST":
+        bid_form = BidForm(request.POST)
+        listing = Listing.objects.get(id=listing_id)  # this is a Listing instance
+        listing_to_add = Watchlist.objects.filter(user=request.user, item=listing) # this is a QuerySet
+        
+        # if listing is not already added to the watchlist
+        if not listing_to_add:
+            new_watchlist_object = Watchlist()
+            new_watchlist_object.item = listing
+            new_watchlist_object.user = request.user
+            new_watchlist_object.save()
+            return HttpResponseRedirect(reverse("watchlist"))
+        else:
+            return render(request, "auctions/view_listing.html", {
+                "message": "This listing has already been added to your watchlist",
+                "listing": listing,
+                "bid_form": bid_form 
+            })
+
+
+def remove_from_watchlist(request, listing_id):
+    if request.method == "POST":
         listing = Listing.objects.get(id=listing_id)
-        new_watchlist_object = Watchlist()
-        new_watchlist_object.item = listing
-        new_watchlist_object.user = request.user
-        new_watchlist_object.save()
-        return HttpResponseRedirect(reverse("watchlist"))
+        bid_form = BidForm(request.POST)
+        listing_to_delete = Watchlist.objects.filter(user=request.user, item=listing)
+        if listing_to_delete:
+            listing_to_delete.delete()
+            return HttpResponseRedirect(reverse("watchlist"))
+        
+        # if the listing to be removed does not exist in the watchlist
+        else:
+            return render(request, "auctions/view_listing.html", {
+                "listing": listing,
+                "bid_form": bid_form,
+                "message": "Item has not been added to your watchlist yet" 
+            })
+    
+        
