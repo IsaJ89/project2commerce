@@ -147,9 +147,18 @@ def view_listing(request, listing_id):
     })
 
 def watchlist(request):
+    listing_ids = []
     watchlist = Watchlist.objects.filter(user=request.user)
+
+    # get the listing ids of all the items in the watchlist
+    for item in watchlist:
+        listing = Listing.objects.get(item_name=item.item)
+        listing_ids.append(listing.id)
+    
+    # using the zip function to combine the two iterables
+    watchlist_and_ids = zip(watchlist, listing_ids)
     return render(request, "auctions/watchlist.html", {
-        "watchlist": watchlist
+        "watchlist_and_ids": watchlist_and_ids
     })
 
 def add_to_watchlist(request, listing_id):

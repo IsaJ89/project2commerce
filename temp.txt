@@ -4,4 +4,11 @@ Email address: isa@emailforcommerce.com
 Password: commerce123
 
 
+python manage.py shell
+from auctions.models import *
 
+user = User.objects.get(username="adil")
+watchlist = Watchlist.objects.filter(user=user)
+for item in watchlist:
+     listing = Listing.objects.get(item_name=item.item)
+     print(listing.id)
