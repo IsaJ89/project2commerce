@@ -8,7 +8,12 @@ class ListingAdmin(admin.ModelAdmin):
 class BidAdmin(admin.ModelAdmin):
     list_display = ("id", "item", "placed_by", "bid_value", "placed_on")
 
+class WatchlistAdmin(admin.ModelAdmin):
+    list_display = ("id", "item" , "user")
+
+
 
 admin.site.register(User)
 admin.site.register(Listing, ListingAdmin)
 admin.site.register(Bid, BidAdmin)
+admin.site.register(Watchlist, WatchlistAdmin)

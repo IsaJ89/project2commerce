@@ -29,5 +29,11 @@ View Listing
         <input type="submit" value="Place bid">
     </form>
 </div>
+<div>
+    <form action="{% url 'add_to_watchlist' listing.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Add To Watchlist">
+    </form>
+</div>
 {% endif %}
 {% endblock %}

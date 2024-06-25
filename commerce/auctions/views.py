@@ -5,7 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from .forms import ListingForm, BidForm
-from .models import User, Listing, Bid
+from .models import User, Listing, Bid, Watchlist
+
+
 
 
 
@@ -143,3 +145,18 @@ def view_listing(request, listing_id):
         "listing": listing,
         "bid_form": bid_form
     })
+
+def watchlist(request):
+    watchlist = Watchlist.objects.filter(user=request.user)
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist
+    })
+
+def add_to_watchlist(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=listing_id)
+        new_watchlist_object = Watchlist()
+        new_watchlist_object.item = listing
+        new_watchlist_object.user = request.user
+        new_watchlist_object.save()
+        return HttpResponseRedirect(reverse("watchlist"))

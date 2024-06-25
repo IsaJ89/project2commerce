@@ -6,6 +6,7 @@ from django.utils.timezone import now
 class User(AbstractUser):
     pass
 
+
 class Listing(models.Model):
     category_choices = [('fashion','Fashion'),
                         ('electronics','Electronics'),
@@ -41,4 +42,7 @@ class Bid(models.Model):
 class Comment(models.Model):
     pass
 
+class Watchlist(models.Model):
+    item = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="is_watched_by", null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watches", null=True)
 
