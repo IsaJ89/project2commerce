@@ -9,35 +9,49 @@ View Listing
         <div><Strong>{{ message }}</Strong></div>
     {% endif %}
 
-<div>
-    <div>Item: {{ listing.item_name }}</div>
-    <div>Description: {{ listing.description }}</div>
-    {% if listing.image %}
-        <div><img src="{{ listing.image.url }}" alt="listing.item_name" height="250" width="250"></div>
+    <div>
+        <div>Item: {{ listing.item_name }}</div>
+        <div>Description: {{ listing.description }}</div>
+        {% if listing.image %}
+            <div><img src="{{ listing.image.url }}" alt="listing.item_name" height="250" width="250"></div>
+        {% endif %}
+        <div>Starting bid: {{ listing.starting_bid }}</div>
+        <div>Current price: {{ listing.current_price }}</div>
+        <div>Created by: {{ listing.created_by }}</div>
+        <div>Created on: {{ listing.created_date}}</div>
+        <div>Category: {{ listing.category }}</div>
+    </div> 
+    {% if user.is_authenticated %}
+        {% if listing.status == True %}
+            <div>
+            <form action="{% url 'view_listing' listing.id %}" method="post">
+                {% csrf_token %}
+                {{ bid_form }}
+                <input type="submit" value="Place bid">
+            </form>
+            </div>
+                <div>
+                    <form action="{% url 'add_to_watchlist' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Add To Watchlist">
+                    </form>
+                    <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Remove From Watchlist">
+                    </form>
+                </div>
+            {% if listing.created_by  ==  request.user %}
+                <div>
+                    <form action="{% url 'close_auction' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Close Auction">
+                    </form>
+                </div>
+            {% endif %}
+        {% elif winner is not None and winner == request.user %}
+            <p>Congratulations! You have won this auction</p>
+        {% else %}
+            <p>This auction is closed</p>
+        {% endif %}
     {% endif %}
-    <div>Starting bid: {{ listing.starting_bid }}</div>
-    <div>Current price: {{ listing.current_price }}</div>
-    <div>Created by: {{ listing.created_by }}</div>
-    <div>Created on: {{ listing.created_date}}</div>
-    <div>Category: {{ listing.category }}</div>
-</div> 
-{% if user.is_authenticated %}
-<div>
-    <form action="{% url 'view_listing' listing.id %}" method="post">
-        {% csrf_token %}
-        {{ bid_form }}
-        <input type="submit" value="Place bid">
-    </form>
-</div>
-<div>
-    <form action="{% url 'add_to_watchlist' listing.id %}" method="post">
-        {% csrf_token %}
-        <input type="submit" value="Add To Watchlist">
-    </form>
-    <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
-        {% csrf_token %}
-        <input type="submit" value="Remove From Watchlist">
-    </form>
-</div>
-{% endif %}
 {% endblock %}

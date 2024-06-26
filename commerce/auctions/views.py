@@ -12,7 +12,7 @@ from .models import User, Listing, Bid, Watchlist
 
 
 def index(request):
-    listings = Listing.objects.all()
+    listings = Listing.objects.filter(status=True)
     for listing in listings:
         bids = listing.bids.all()
         if bids.exists():
@@ -95,20 +95,21 @@ def create_listing(request):
 def view_listing(request, listing_id):
     bid_form = BidForm()
     listing = Listing.objects.get(pk=listing_id)
-    bids = listing.bids.all() # get bids associated with the listing; bids is a QuerySet object
-    if bids.exists():
-            highest_bid = max(bid.bid_value for bid in bids)
-            listing.current_price = highest_bid
+    bid = listing.bids.last() # get bids associated with the listing; bids is a QuerySet object
+    if bid:
+        highest_bid = bid.bid_value
+        winner = bid.placed_by
+        listing.current_price = highest_bid
     else:
         listing.current_price = listing.starting_bid
-
+        winner = None
     if request.method == "POST":
         bid_form = BidForm(request.POST)
         if bid_form.is_valid():
             bid_value = bid_form.cleaned_data['bid_value']
         
-            if bids.exists():# check if the listing has bids associate with it
-                highest_bid = max(bid.bid_value for bid in bids)
+            if bid: # check if the listing has bids associate with it
+                highest_bid = bid.bid_value
                 if bid_value < highest_bid:
                         return render(request, "auctions/view_listing.html",{
                             "listing": listing,
@@ -143,7 +144,8 @@ def view_listing(request, listing_id):
     
     return render(request, "auctions/view_listing.html", {
         "listing": listing,
-        "bid_form": bid_form
+        "bid_form": bid_form,
+        "winner" : winner
     })
 
 
@@ -200,4 +202,14 @@ def remove_from_watchlist(request, listing_id):
                 "message": "Item has not been added to your watchlist yet" 
             })
     
+
+def close_auction(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=listing_id)
+        listing.status = False
+        listing.save()
         
+        return render(request, "auctions/view_listing.html", {
+            "listing": listing,
+        })
+

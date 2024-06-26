@@ -3,13 +3,22 @@ Username: Isa
 Email address: isa@emailforcommerce.com
 Password: commerce123
 
+python manage.py runserver
 python manage.py makemigrations
 python manage.py migrate
 python manage.py shell
 from auctions.models import *
 
-user = User.objects.get(username="adil")
-watchlist = Watchlist.objects.filter(user=user)
-for item in watchlist:
-     listing = Listing.objects.get(item_name=item.item)
-     print(listing.id)
+
+(InteractiveConsole)
+>>> from auctions.models import *
+>>> listing = Listing.objects.get(id=6)
+>>> bid = listing.bids.last()
+>>> print(bid.bid_value)
+2200.00
+>>> print(bid.placed_by)
+bubbla
+
+
+Next task->
+Add logic to view_listing to determine the winner
