@@ -5,3 +5,6 @@ __pycache__/
 
 # Ignore macOS system files
 .DS_Store
+
+# Ignore database files
+db.sqlite3
