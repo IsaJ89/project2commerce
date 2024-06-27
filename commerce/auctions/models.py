@@ -28,7 +28,7 @@ class Listing(models.Model):
     status = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.item})"
+        return f"{self.item}"
 
 
 class Bid(models.Model):
@@ -41,9 +41,14 @@ class Bid(models.Model):
         return f"Item: {self.item} Bid Value:{self.bid_value}"
 
 class Comment(models.Model):
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="comments",null=True)
+    item = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="comments",null=True)
     made_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="comments",null=True)
+    comment = models.TextField(max_length=300, default="Add comment here")
     made_on = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return f"{self.comment}"
+
 
 class Watchlist(models.Model):
     item = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="is_watched_by", null=True)

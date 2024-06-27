@@ -4,8 +4,8 @@ from django.utils.timezone import now
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from .forms import ListingForm, BidForm
-from .models import User, Listing, Bid, Watchlist
+from .forms import ListingForm, BidForm, CommentForm
+from .models import User, Listing, Bid, Watchlist, Comment
 
 
 
@@ -93,9 +93,12 @@ def create_listing(request):
 })
 
 def view_listing(request, listing_id):
-    bid_form = BidForm()
+    # get listing instance
     listing = Listing.objects.get(pk=listing_id)
-    bid = listing.bids.last() # get bids associated with the listing; bids is a QuerySet object
+    
+    # process bids
+    bid_form = BidForm()
+    bid = listing.bids.last() # get the most recent bid(which would also be the highest)associated with a listing
     if bid:
         highest_bid = bid.bid_value
         winner = bid.placed_by
@@ -103,48 +106,74 @@ def view_listing(request, listing_id):
     else:
         listing.current_price = listing.starting_bid
         winner = None
+
+    # process comments
+    comment_form = CommentForm()
+    comments = listing.comments.all()
+    check_for_comments = comments.exists()
+
     if request.method == "POST":
+        # process bid_form returned via POST method
         bid_form = BidForm(request.POST)
         if bid_form.is_valid():
             bid_value = bid_form.cleaned_data['bid_value']
-        
-            if bid: # check if the listing has bids associate with it
-                highest_bid = bid.bid_value
-                if bid_value < highest_bid:
+
+            if bid_value is not None:
+                if bid: # check if the listing has bids associate with it
+                    highest_bid = bid.bid_value
+                    if bid_value < highest_bid:
                         return render(request, "auctions/view_listing.html",{
                             "listing": listing,
                             "message": "Sorry, bid must be higher than the current price of the item",
-                            "bid_form": bid_form
+                            "bid_form": bid_form,
+                            "comment_form": comment_form
                         })
-                else:
-                    new_bid_object = bid_form.save(commit=False)
-                    new_bid_object.item = listing
-                    new_bid_object.placed_by = request.user
-                    new_bid_object.placed_on = now()
-                    new_bid_object.save()
-                    listing.current_price = new_bid_object.bid_value
-                    return HttpResponseRedirect(reverse("view_listing", args=(listing.id,)))
+                    else:
+                        new_bid_object = bid_form.save(commit=False)
+                        new_bid_object.item = listing
+                        new_bid_object.placed_by = request.user
+                        new_bid_object.placed_on = now()
+                        new_bid_object.save()
+                        listing.current_price = new_bid_object.bid_value
+                        return HttpResponseRedirect(reverse("view_listing", args=(listing.id,)))
                         
-            else:
-                # if no pre-exising bids, check if bid_value is lesser than starting_bid
-                if bid_value < listing.starting_bid:
-                    return render(request, "auctions/view_listing.html",{
-                        "listing" : listing,
-                        "message": "Sorry! Your bid must be higher than the starting bid",
-                        "bid_form": bid_form
-                    })
                 else:
-                    new_bid_object = bid_form.save(commit=False)
-                    new_bid_object.item = listing
-                    new_bid_object.placed_by = request.user
-                    new_bid_object.placed_on = now()
-                    new_bid_object.save()
-                    listing.current_price = new_bid_object.bid_value
-                    return HttpResponseRedirect(reverse("view_listing", args=(listing.id,)))
+                    # if no pre-exising bids, check if bid_value is lesser than starting_bid
+                    if bid_value < listing.starting_bid:
+                        return render(request, "auctions/view_listing.html",{
+                            "listing" : listing,
+                            "message": "Sorry! Your bid must be higher than the starting bid",
+                            "bid_form": bid_form,
+                            "comment_form": comment_form
+                        })
+                    else:
+                        new_bid_object = bid_form.save(commit=False)
+                        new_bid_object.item = listing
+                        new_bid_object.placed_by = request.user
+                        new_bid_object.placed_on = now()
+                        new_bid_object.save()
+                        listing.current_price = new_bid_object.bid_value
+                        return HttpResponseRedirect(reverse("view_listing", args=(listing.id,)))
+        
+        # process comment returned via POST method
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.cleaned_data['comment']
+            
+            if comment is not None:
+                new_comment_object = comment_form.save(commit=False)
+                new_comment_object.item = listing
+                new_comment_object.made_by = request.user
+                new_comment_object.made_on = now()
+                new_comment_object.save()
+                return HttpResponseRedirect(reverse("view_listing", args=(listing_id,)))
     
     return render(request, "auctions/view_listing.html", {
         "listing": listing,
         "bid_form": bid_form,
+        "comment_form": comment_form,
+        "comments": comments,
+        "check_for_comments": check_for_comments,
         "winner" : winner
     })
 
