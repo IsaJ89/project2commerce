@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+{% block title %}Listings Under Category{% endblock %}
+
+{% block body %}
+{% if listings_check %}
+    <ul>
+        {% for listing in listings %}
+            <li><a href="{% url 'view_listing' listing.id%}">{{ listing.item }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock  %}

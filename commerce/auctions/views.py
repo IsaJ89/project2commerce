@@ -251,3 +251,21 @@ def close_auction(request, listing_id):
             "message": message
         })
 
+def categories(request):
+    categories_to_display = []
+    for choices in Listing.category_choices:
+        categories_to_display.append(choices[1])
+
+    return render(request, "auctions/categories.html",{
+        "categories_to_display": categories_to_display,
+    })
+
+
+def listings_under_category(request, category):
+    category = category.lower()
+    listings = Listing.objects.filter(category=category)
+    listings_check = listings.exists()
+    return render(request, "auctions/listings_under_category.html",{
+        "listings": listings,
+        "listings_check": listings_check,
+    })
