@@ -20,5 +20,10 @@ from auctions.models import *
 bubbla
 
 
+
+comment_form = CommentForm()
+    
+    comments = listing.comments.all()
+
 Next task->
 Add logic to view_listing to determine the winner

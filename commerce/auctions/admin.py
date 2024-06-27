@@ -3,7 +3,7 @@ from .models import *
 
 # Register your models here.
 class ListingAdmin(admin.ModelAdmin):
-    list_display = ("id", "item_name", "created_by", "created_date", "status", "description", "starting_bid", "image", "category")
+    list_display = ("id", "item", "created_by", "created_date", "status", "description", "starting_bid", "image", "category")
     fields = ("status",)
 
 class BidAdmin(admin.ModelAdmin):
@@ -12,9 +12,13 @@ class BidAdmin(admin.ModelAdmin):
 class WatchlistAdmin(admin.ModelAdmin):
     list_display = ("id", "item" , "user")
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("item", "comment", "made_by", "made_on")
+
 
 
 admin.site.register(User)
 admin.site.register(Listing, ListingAdmin)
 admin.site.register(Bid, BidAdmin)
 admin.site.register(Watchlist, WatchlistAdmin)
+admin.site.register(Comment, CommentAdmin)
