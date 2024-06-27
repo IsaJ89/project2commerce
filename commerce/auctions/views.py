@@ -206,10 +206,19 @@ def remove_from_watchlist(request, listing_id):
 def close_auction(request, listing_id):
     if request.method == "POST":
         listing = Listing.objects.get(id=listing_id)
+        bid = listing.bids.last()
+        if bid:
+            listing.current_price = bid.bid_value
+            message = "Congratulations for having sold your item! We hope you enjoyed selling with us"
+        else:
+            listing.current_price = listing.starting_bid
+            message = "Sorry for having to close the auction without any bids! We hope you " \
+            "have a better experience next time!"
         listing.status = False
         listing.save()
         
         return render(request, "auctions/view_listing.html", {
             "listing": listing,
+            "message": message
         })
 
