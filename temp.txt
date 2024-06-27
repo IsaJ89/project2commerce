@@ -10,20 +10,6 @@ python manage.py shell
 from auctions.models import *
 
 
-(InteractiveConsole)
->>> from auctions.models import *
->>> listing = Listing.objects.get(id=6)
->>> bid = listing.bids.last()
->>> print(bid.bid_value)
-2200.00
->>> print(bid.placed_by)
-bubbla
-
-
-
-comment_form = CommentForm()
-    
-    comments = listing.comments.all()
 
 Next task->
-Add logic to view_listing to determine the winner
+Work on the design now that an MVP is ready
