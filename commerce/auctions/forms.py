@@ -6,7 +6,7 @@ from .models import Listing, Bid
 class ListingForm(ModelForm):
     class Meta:
         model = Listing
-        fields = ['item_name','description','starting_bid','image','category']
+        fields = ['item','description','starting_bid','image','category']
 
 class BidForm(ModelForm):
     class Meta:

@@ -155,7 +155,7 @@ def watchlist(request):
 
     # get the listing ids of all the items in the watchlist
     for item in watchlist:
-        listing = Listing.objects.get(item_name=item.item)
+        listing = Listing.objects.get(item=item.item)
         listing_ids.append(listing.id)
     
     # using the zip function to combine the two iterables and turning it into a list of tuples
