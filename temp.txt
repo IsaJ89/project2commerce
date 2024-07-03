@@ -12,4 +12,5 @@ from auctions.models import *
 
 
 Next task->
-Work on the design now that an MVP is ready
+Work on the design now that the MVP is ready
+
